@@ -35,7 +35,7 @@ def gram_matrix(tensor):
   return tf.matmul(tf.transpose(matrix), matrix)
 
 def style_loss(session, model, style_image, layer_ids):
-  feed_dict = model.create_feed_dict(image=style_image)o
+  feed_dict = model.create_feed_dict(image=style_image)
 
   layers = model.get_layer_tensors(layer_ids)
 
@@ -53,3 +53,16 @@ def style_loss(session, model, style_image, layer_ids):
     total_loss = tf.reduce_mean(layer_losses)
 
   return total_loss
+
+
+# shifts input image by 1 pixel on x and y axis
+# calculate difference between shifted and original image
+# absolute value to make positive
+# calculate sum of pixels in those images
+# helps suppress noise in mixed image we are generating
+
+def denoise_loss(model):
+  loss = tf.reduce_sum(tf.abs(model.input[:,1:,:,:] - model.input[:,:-1,:,:])) + \
+    tf.reduce_sum(tf.abs(model.input[:,:,1:,:] - model.input[:,:,:-1,:]))
+
+  return loss
