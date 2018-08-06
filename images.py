@@ -45,17 +45,19 @@ def plot_images(content_image, style_image, mixed_image):
   else:
     interpolation = 'nearest'
 
-                                                                    # Plot the content-image.
+  # Plot the content-image.
   # Note that the pixel-values are normalized to
   # the [0.0, 1.0] range by dividing with 255.
   ax = axes.flat[0]
   ax.imshow(content_image / 255.0, interpolation=interpolation)
   ax.set_xlabel("Content")
-                                                                    # Plot the mixed-image.
+
+  # Plot the mixed-image.
   ax = axes.flat[1]
   ax.imshow(mixed_image / 255.0, interpolation=interpolation)
   ax.set_xlabel("Mixed")
-                                                                    # Plot the style-image
+
+  # Plot the style-image
   ax = axes.flat[2]
   ax.imshow(style_image / 255.0, interpolation=interpolation)
   ax.set_xlabel("Style")
