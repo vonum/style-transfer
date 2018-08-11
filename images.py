@@ -22,7 +22,7 @@ def save_image(image, filename):
   image = image.astype(np.uint8)
 
   with open(filename, 'wb') as file:
-    PIL.Image.fromarray(image).save(file, 'jpg')
+    PIL.Image.fromarray(image).save(file, 'jpeg')
 
 def image_big(image):
   image = np.clip(image, 0.0, 255.0)

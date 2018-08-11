@@ -1,3 +1,6 @@
 Tensorflow
 Numpy
 argparse
+download
+Pillow
+matplotlib

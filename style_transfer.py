@@ -123,11 +123,9 @@ def style_transfer(content_image, style_image,
       msg = "Weight Adj. for Content: {0:.2e}, Style: {1:.2e}, Denoise: {2:.2e}"
       print(msg.format(adj_content_val, adj_style_val, adj_denoise_val))
 
-      #in larger resolution
-      # Plot the content-, style- and mixed-images.
-      plot_images(content_image=content_image,
-                  style_image=style_image,
-                  mixed_image=mixed_image)
+      # plot_images(content_image=content_image,
+      #             style_image=style_image,
+      #             mixed_image=mixed_image)
 
   # Close the TensorFlow session to release its resources.
   session.close()
