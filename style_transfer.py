@@ -3,13 +3,14 @@ import numpy as np
 
 import vgg16
 from loss import content_loss, style_loss, denoise_loss
+from optimizers import create_optimizer
 from images import plot_images
 
 def style_transfer(content_image, style_image,
                    content_layer_ids, style_layer_ids,
                    weight_content=1.5, weight_style=10.0,
                    weight_denoise=0.3, learning_rate=10.0,
-                   num_iterations=120):
+                   num_iterations=120, optimizer="adam"):
 
   model = vgg16.VGG16()
   session = tf.InteractiveSession(graph=model.graph)
@@ -70,7 +71,7 @@ def style_transfer(content_image, style_image,
                   weight_style * adj_style * loss_style + \
                   weight_denoise * adj_denoise * loss_denoise
 
-  optimizer = tf.train.AdamOptimizer(learning_rate=0.1)
+  optimizer = create_optimizer(optimizer, learning_rate)
   gvs = optimizer.compute_gradients(loss_combined, model.input)
 
   # List of tensors that we will run in each optimization iteration.
