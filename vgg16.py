@@ -26,8 +26,6 @@ data_dir = "vgg16/"
 # File containing the TensorFlow graph definition. (Downloaded)
 path_graph_def = "vgg16.tfmodel"
 
-
-
 def maybe_download():
     """
     Download the VGG16 model from the internet if it does not already
@@ -40,7 +38,6 @@ def maybe_download():
     # This function should not extract the file when it does not have
     # a relevant filename-extensions such as .zip or .tar.gz
     download.maybe_download_and_extract(url=data_url, download_dir=data_dir)
-
 
 class VGG16:
     """
@@ -65,7 +62,7 @@ class VGG16:
                    'conv4_1/conv4_1', 'conv4_2/conv4_2', 'conv4_3/conv4_3',
                    'conv5_1/conv5_1', 'conv5_2/conv5_2', 'conv5_3/conv5_3']
 
-    def __init__(self):
+    def __init__(self, data_dir="vgg16/"):
         # Now load the model from file. The way TensorFlow
         # does this is confusing and requires several steps.
 

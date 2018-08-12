@@ -13,6 +13,7 @@ ap.add_argument('--iter', type=int, default=500)
 ap.add_argument('--opt', type=str, default="adam")
 ap.add_argument('--content', type=str)
 ap.add_argument('--style', type=str)
+ap.add_argument('--model_path', type=str, default="vgg16/")
 
 args = vars(ap.parse_args())
 
@@ -31,6 +32,8 @@ CONTENT_IMAGE_PATH = CONTENT_PATH + args['content']
 STYLE_IMAGE_PATH = STYLE_PATH + args['style']
 OUTPUT_IMAGE_PATH = OUTPUT_PATH + "output.jpg"
 
+MODEL_PATH = args['model_path']
+
 content_image = load_image(CONTENT_IMAGE_PATH, max_size=None)
 style_image = load_image(STYLE_IMAGE_PATH, max_size=300)
 
@@ -46,6 +49,7 @@ mixed_image = style_transfer(content_image=content_image,
                              weight_denoise=WEIGHT_DENOISE,
                              learning_rate=LEARNING_RATE,
                              num_iterations=NUM_ITERATIONS,
-                             optimizer=OPTIMIZER)
+                             optimizer=OPTIMIZER,
+                             data_dir=MODEL_PATH)
 
 save_image(mixed_image, OUTPUT_IMAGE_PATH)

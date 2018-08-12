@@ -10,9 +10,10 @@ def style_transfer(content_image, style_image,
                    content_layer_ids, style_layer_ids,
                    weight_content=1.5, weight_style=10.0,
                    weight_denoise=0.3, learning_rate=10.0,
-                   num_iterations=120, optimizer="adam"):
+                   num_iterations=120, optimizer="adam",
+                   data_dir="vgg16/"):
 
-  model = vgg16.VGG16()
+  model = vgg16.VGG16(data_dir=data_dir)
   session = tf.InteractiveSession(graph=model.graph)
 
   # Print the names of the content-layers.
