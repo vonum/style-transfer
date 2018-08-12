@@ -14,6 +14,7 @@ ap.add_argument('--opt', type=str, default="adam")
 ap.add_argument('--content', type=str)
 ap.add_argument('--style', type=str)
 ap.add_argument('--model_path', type=str, default="vgg16/")
+ap.add_argument('--output_path', type=str, default="/output/")
 
 args = vars(ap.parse_args())
 
@@ -30,9 +31,10 @@ OUTPUT_PATH = "data/output/"
 
 CONTENT_IMAGE_PATH = CONTENT_PATH + args['content']
 STYLE_IMAGE_PATH = STYLE_PATH + args['style']
-OUTPUT_IMAGE_PATH = OUTPUT_PATH + "output.jpg"
 
 MODEL_PATH = args['model_path']
+OUTPUT_PATH = args['output_path']
+OUTPUT_IMAGE_PATH = OUTPUT_PATH + "output.jpg"
 
 content_image = load_image(CONTENT_IMAGE_PATH, max_size=None)
 style_image = load_image(STYLE_IMAGE_PATH, max_size=300)
