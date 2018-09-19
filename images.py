@@ -16,6 +16,11 @@ def load_image(filename, max_size=None):
 
   return np.float32(image)
 
+# VGG19 requires input dimension to be (batch, height, width, channel)
+def add_one_dim(image):
+  shape = (1,) + image.shape
+  return np.reshape(image, shape)
+
 def save_image(image, filename):
   # Ensure the pixel-values are between 0 and 255.
   image = np.clip(image, 0.0, 255.0)
