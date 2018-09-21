@@ -51,9 +51,9 @@ def style_transfer(content_image, style_image,
 
   # Create TensorFlow variables for adjusting the values of
   # the loss-functions. This is explained below.
-  adj_content = tf.Variable(1e-10, name='adj_content')
-  adj_style = tf.Variable(1e-10, name='adj_style')
-  adj_denoise = tf.Variable(1e-10, name='adj_denoise')
+  adj_content = tf.Variable(1e-10, name="adj_content")
+  adj_style = tf.Variable(1e-10, name="adj_style")
+  adj_denoise = tf.Variable(1e-10, name="adj_denoise")
 
   # Initialize the adjustment values for the loss-functions.
   session.run([adj_content.initializer,

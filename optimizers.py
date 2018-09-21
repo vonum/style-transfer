@@ -1,5 +1,7 @@
 import tensorflow as tf
 
+L_BFGS = "l_bfgs"
+
 def create_optimizer(optimizer, learning_rate):
   if optimizer == "adam":
     return adam(learning_rate)
@@ -16,8 +18,12 @@ def adam(learning_rate):
 def gradient_descent(learning_rate):
   return tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
 
-def l_bfgs():
-  pass
+def l_bfgs(loss, max_iter):
+  return tf.contrib.opt.ScipyOptimizerInterface(
+    loss,
+    method="L-BFGS-B",
+    options={"maxiter": max_iter}
+  )
 
 def adagrad(learning_rate):
   return tf.train.AdagradOptimizer(learning_rate=learning_rate)
