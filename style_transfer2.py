@@ -117,7 +117,7 @@ class StyleTransfer:
     return self.style_loss
 
   def _create_tv_loss(self):
-    self.tv_loss = tf.image.total_variation(self.x)
+    self.tv_loss = tf.image.total_variation(self.x[0])
 
   def _create_optimizer(self):
     if self.optimizer_type == optimizers.L_BFGS:
@@ -132,10 +132,19 @@ class StyleTransfer:
       self._optimize_rest()
 
   def _optimize_lbgfs(self):
+    global _iter
+    _iter = 0
+
+    def callback(l, cl, sl, tvl):
+      global _iter
+      print(f"Iteration: {_iter}|loss {l}|{cl}|{sl}|{tvl}")
+      _iter += 1
+
     self.optimizer.minimize(
       self.sess,
       feed_dict={self.p: self.p0, self.a: self.a0},
-      fetches=[self.loss, self.content_loss, self.style_loss]
+      fetches=[self.loss, self.content_loss, self.style_loss, self.tv_loss],
+      loss_callback=callback
     )
 
   def _optimize_rest(self):
