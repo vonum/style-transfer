@@ -4,17 +4,20 @@ import numpy as np
 from loss import gram_matrix
 import optimizers
 from optimizers import l_bfgs
+from images import plot_images
 
 # add content loss norm type and init strategy
 class StyleTransfer:
   def __init__(self, sess, net, iterations, content_layers, style_layers,
                content_image, style_image, content_layer_weights,
                style_layer_weights, content_loss_weight, style_loss_weight,
-               tv_loss_weight, optimizer_type, learning_rate=None):
+               tv_loss_weight, optimizer_type, learning_rate=None,
+               plot=False):
     self.sess = sess
     self.net = net
     self.iterations = iterations
     self.optimizer_type = optimizer_type
+    self.plot = plot
 
     self.content_layers = content_layers
     self.style_layers = style_layers
@@ -135,15 +138,20 @@ class StyleTransfer:
     global _iter
     _iter = 0
 
-    def callback(l, cl, sl, tvl):
+    def callback(x, l, cl, sl, tvl):
       global _iter
-      print(f"Iteration: {_iter}|loss {l}|{cl}|{sl}|{tvl}")
+      if (_iter % 10 == 0) or (_iter == self.iterations - 1):
+        print(f"Iteration: {_iter}|loss {l}|{cl}|{sl}|{tvl}")
+        if self.plot: self._plot_images(self.p0, x, self.a0)
       _iter += 1
+
+    feed_dict = {self.p: self.p0, self.a: self.a0}
+    fetches = [self.x, self.loss, self.content_loss, self.style_loss, self.tv_loss]
 
     self.optimizer.minimize(
       self.sess,
-      feed_dict={self.p: self.p0, self.a: self.a0},
-      fetches=[self.loss, self.content_loss, self.style_loss, self.tv_loss],
+      feed_dict=feed_dict,
+      fetches=fetches,
       loss_callback=callback
     )
 
@@ -160,7 +168,13 @@ class StyleTransfer:
     return self.net.preprocess(image)
 
   def _postprocess_image(self, image):
-    return np.clip(self.net.undo_preprocess(image), 0.0, 255.0)
+    return np.clip(self.net.undo_preprocess(image), 0.0, 255.0)[0]
+
+  def _plot_images(self, p, x, a):
+    p = self._postprocess_image(p)
+    a = self._postprocess_image(a)
+    x = self._postprocess_image(x)
+    plot_images(content_image=p, style_image=a, mixed_image=x)
 
   def _feed_forward(self, tensor, scope=None):
     return self.net.feed_forward(tensor, scope)
