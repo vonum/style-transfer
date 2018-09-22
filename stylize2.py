@@ -1,7 +1,6 @@
 import argparse
 import tensorflow as tf
 
-import optimizers
 import vgg19
 from style_transfer2 import StyleTransfer
 
@@ -92,7 +91,7 @@ ap.add_argument(
 ap.add_argument(
   "--optimizer",
   type=str,
-  default="adam",
+  default="l_bfgs",
   help="Optimizer for style transfer"
 )
 ap.add_argument(
@@ -149,7 +148,7 @@ st = StyleTransfer(
   CONTENT_LOSS_WEIGHT,
   STYLE_LOSS_WEIGHT,
   TV_LOSS_WEIGHT,
-  optimizers.L_BFGS
+  OPTIMIZER
 )
 
 mixed_image = st.run()

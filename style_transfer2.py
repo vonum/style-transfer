@@ -6,17 +6,23 @@ import optimizers
 from optimizers import l_bfgs
 from images import plot_images
 
+INIT_IMG_RANDOM = "random"
+INIT_IMG_CONTENT = "content"
+INIT_IMG_STYLE = "style"
+
 # add content loss norm type and init strategy
 class StyleTransfer:
   def __init__(self, sess, net, iterations, content_layers, style_layers,
                content_image, style_image, content_layer_weights,
                style_layer_weights, content_loss_weight, style_loss_weight,
                tv_loss_weight, optimizer_type, learning_rate=None,
-               plot=False):
+               plot=False, init_img_type=INIT_IMG_RANDOM):
     self.sess = sess
     self.net = net
     self.iterations = iterations
     self.optimizer_type = optimizer_type
+
+    self.init_img_type = init_img_type
     self.plot = plot
 
     self.content_layers = content_layers
@@ -31,7 +37,7 @@ class StyleTransfer:
     # variable names from the paper
     self.p0 = np.float32(self._preprocess_image(content_image))
     self.a0 = np.float32(self._preprocess_image(style_image))
-    self.x0 = self.init_img(content_image, "")
+    self.x0 = self.init_img()
 
   def run(self):
     self._build_graph()
@@ -158,8 +164,15 @@ class StyleTransfer:
   def _optimize_rest(self):
     pass
 
-  def init_img(self, image, strategy):
-    return np.random.normal(size=image.shape, scale=np.std(image))
+  def init_img(self):
+    if self.init_img_type == INIT_IMG_RANDOM:
+      return np.random.normal(size=self.p0.shape, scale=np.std(self.p0))
+    elif self.init_img_type == INIT_IMG_CONTENT:
+      return self.p0
+    elif self.init_img_type == INIT_IMG_STYLE:
+      return self.a0
+    else:
+      raise "Unsupported initialization strategy"
 
   def _content_norm_factor(self, strategy):
     pass
