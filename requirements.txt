@@ -4,3 +4,4 @@ argparse
 download
 Pillow
 matplotlib
+scipy
