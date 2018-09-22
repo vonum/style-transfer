@@ -14,3 +14,5 @@ var
 .DS_Store
 
 vgg16/
+vgg19/
+papers/
