@@ -43,8 +43,7 @@ class StyleTransfer:
   def run(self):
     self._build_graph()
 
-    init_op = tf.global_variables_initializer()
-    self.sess.run(init_op)
+    self.sess.run(tf.global_variables_initializer())
 
     self._optimize()
 
@@ -134,10 +133,13 @@ class StyleTransfer:
       self.optimizer = l_bfgs(self.loss, self.iterations)
     elif self.optimizer_type == optimizers.ADAM:
       self.optimizer = adam(self.learning_rate)
+      self.train_op = self.optimizer.minimize(self.loss)
     elif self.optimizer_type == optimizers.ADAGRAD:
       self.optimizer = adagrad(self.learning_rate)
+      self.train_op = self.optimizer.minimize(self.loss)
     elif self.optimizer_type == optimizers.GRADIENT_DESCENT:
       self.optimizer = gradient_descent(self.learning_rate)
+      self.train_op = self.optimizer.minimize(self.loss)
     else:
       raise "Unsupported optimizer"
 
@@ -153,9 +155,7 @@ class StyleTransfer:
 
     def callback(x, l, cl, sl, tvl):
       global _iter
-      if (_iter % 10 == 0) or (_iter == self.iterations - 1):
-        print(f"Iteration: {_iter}|loss {l}|{cl}|{sl}|{tvl}")
-        if self.plot: self._plot_images(self.p0, x, self.a0)
+      self._print_training_state(_iter, x, l, cl, sl, tvl)
       _iter += 1
 
     feed_dict = {self.p: self.p0, self.a: self.a0}
@@ -169,8 +169,14 @@ class StyleTransfer:
     )
 
   def _optimize_rest(self):
+    feed_dict = {self.p: self.p0, self.a: self.a0}
+    run_list = [self.train_op, self.x, self.loss,
+                self.content_loss, self.style_loss, self.tv_loss]
+
     for i in range(0, self.iterations):
-      self.optimizer.minimize(self.loss)
+      _, x, l, cl, sl, tvl = self.sess.run(run_list,
+                                           feed_dict=feed_dict)
+      self._print_training_state(i, x, l, cl, sl, tvl)
 
   def init_img(self):
     if self.init_img_type == INIT_IMG_RANDOM:
@@ -199,3 +205,8 @@ class StyleTransfer:
 
   def _feed_forward(self, tensor, scope=None):
     return self.net.feed_forward(tensor, scope)
+
+  def _print_training_state(self, i, x, l, cl, sl, tvl):
+    if (i % 10 == 0) or (i == self.iterations - 1):
+      print(f"Iteration: {i}|loss {l}|{cl}|{sl}|{tvl}")
+      if self.plot: self._plot_images(self.p0, x, self.a0)
