@@ -1,6 +1,9 @@
 import tensorflow as tf
 
 L_BFGS = "l_bfgs"
+ADAM = "ADAM"
+ADAGRAD = "ADAGRAD"
+GRADIENT_DESCENT = "GRADIENT_DESCENT"
 
 def create_optimizer(optimizer, learning_rate):
   if optimizer == "adam":

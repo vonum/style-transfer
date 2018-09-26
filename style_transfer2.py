@@ -3,7 +3,7 @@ import numpy as np
 
 from loss import gram_matrix
 import optimizers
-from optimizers import l_bfgs
+from optimizers import l_bfgs, adam, adagrad, gradient_descent
 from images import plot_images
 
 INIT_IMG_RANDOM = "random"
@@ -21,6 +21,7 @@ class StyleTransfer:
     self.net = net
     self.iterations = iterations
     self.optimizer_type = optimizer_type
+    self.learning_rate = learning_rate
 
     self.init_img_type = init_img_type
     self.plot = plot
@@ -131,6 +132,12 @@ class StyleTransfer:
   def _create_optimizer(self):
     if self.optimizer_type == optimizers.L_BFGS:
       self.optimizer = l_bfgs(self.loss, self.iterations)
+    elif self.optimizer_type == optimizers.ADAM:
+      self.optimizer = adam(self.learning_rate)
+    elif self.optimizer_type == optimizers.ADAGRAD:
+      self.optimizer = adagrad(self.learning_rate)
+    elif self.optimizer_type == optimizers.GRADIENT_DESCENT:
+      self.optimizer = gradient_descent(self.learning_rate)
     else:
       raise "Unsupported optimizer"
 
@@ -162,7 +169,8 @@ class StyleTransfer:
     )
 
   def _optimize_rest(self):
-    pass
+    for i in range(0, self.iterations):
+      self.optimizer.minimize(self.loss)
 
   def init_img(self):
     if self.init_img_type == INIT_IMG_RANDOM:
