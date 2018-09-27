@@ -101,9 +101,10 @@ class StyleTransfer:
 
       # batch_size, height, width, number of filters
       _, h, w, d = X.get_shape()
+      N = h.value * w.value
+      M = d.value
+      factor = (1. / (2. * np.sqrt(M) * np.sqrt(N)))
       self.content_loss += cw[i] * tf.reduce_sum(tf.square(X - P)) / 2
-
-    return self.content_loss
 
   def _create_style_loss(self):
     self.style_loss = 0
@@ -122,8 +123,6 @@ class StyleTransfer:
       A_gram = gram_matrix(A)
 
       self.style_loss += sw[i] * (1. / (4 * N ** 2 * M ** 2)) * tf.reduce_sum(tf.square(X_gram - A_gram))
-
-    return self.style_loss
 
   def _create_tv_loss(self):
     self.tv_loss = tf.image.total_variation(self.x[0])

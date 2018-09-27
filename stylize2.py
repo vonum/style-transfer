@@ -21,7 +21,7 @@ ap.add_argument(
 ap.add_argument(
   "--output_image_path",
   type=str,
-  default="/output/", # for floydhub
+  default="/output/output.jpg", # for floydhub
   help="Path for output file"
 )
 ap.add_argument(
@@ -99,6 +99,12 @@ ap.add_argument(
   action="store_true",
   help="Transfer style but keep original content colors"
 )
+ap.add_argument(
+  "--max_size",
+  type=int,
+  default=512,
+  help="Max size for content image"
+)
 
 args = vars(ap.parse_args())
 
@@ -112,9 +118,12 @@ STYLE_IMAGE_PATH = STYLE_PATH + args["style_image"]
 MODEL_PATH = args["model_path"]
 OUTPUT_IMAGE_PATH = args["output_image_path"]
 
-content_image = load_image(CONTENT_IMAGE_PATH, max_size=None)
+MAX_SIZE = args["max_size"]
+
+content_image = load_image(CONTENT_IMAGE_PATH, max_size=MAX_SIZE)
 content_image = add_one_dim(content_image)
-style_image = load_image(STYLE_IMAGE_PATH, max_size=300)
+content_shape = [content_image.shape[1], content_image.shape[0]]
+style_image = load_image(STYLE_IMAGE_PATH, shape=content_shape)
 style_image = add_one_dim(style_image)
 
 CONTENT_LAYERS = args["content_layers"]
@@ -148,7 +157,8 @@ st = StyleTransfer(
   CONTENT_LOSS_WEIGHT,
   STYLE_LOSS_WEIGHT,
   TV_LOSS_WEIGHT,
-  OPTIMIZER
+  OPTIMIZER,
+  init_img_type="content"
 )
 
 mixed_image = st.run()

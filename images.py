@@ -2,7 +2,8 @@ import numpy as np
 import PIL.Image
 import matplotlib.pyplot as plt
 
-def load_image(filename, max_size=None):
+def load_image(filename, max_size=None, shape=None):
+  # PIL.Image.LANCZOS is one of resampling filter
   image = PIL.Image.open(filename)
 
   if max_size is not None:
@@ -13,6 +14,9 @@ def load_image(filename, max_size=None):
      size = size.astype(int)
 
      image = image.resize(size, PIL.Image.LANCZOS)
+
+  if shape is not None:
+    image = image.resize(shape, PIL.Image.LANCZOS)
 
   return np.float32(image)
 
