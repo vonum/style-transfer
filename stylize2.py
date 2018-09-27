@@ -163,4 +163,6 @@ st = StyleTransfer(
 
 mixed_image = st.run()
 
+sess.close()
+
 save_image(mixed_image, OUTPUT_IMAGE_PATH)

@@ -40,9 +40,9 @@ class StyleTransfer:
     self.a0 = np.float32(self._preprocess_image(style_image))
     self.x0 = self.init_img()
 
-  def run(self):
     self._build_graph()
 
+  def run(self):
     self.sess.run(tf.global_variables_initializer())
 
     self._optimize()
@@ -101,9 +101,9 @@ class StyleTransfer:
 
       # batch_size, height, width, number of filters
       _, h, w, d = X.get_shape()
-      N = h.value * w.value
-      M = d.value
-      factor = (1. / (2. * np.sqrt(M) * np.sqrt(N)))
+      # N = h.value * w.value
+      # M = d.value
+      # factor = (1. / (2. * np.sqrt(M) * np.sqrt(N)))
       self.content_loss += cw[i] * tf.reduce_sum(tf.square(X - P)) / 2
 
   def _create_style_loss(self):
@@ -194,7 +194,10 @@ class StyleTransfer:
     return self.net.preprocess(image)
 
   def _postprocess_image(self, image):
-    return np.clip(self.net.undo_preprocess(image), 0.0, 255.0)[0]
+    res_image = np.clip(self.net.undo_preprocess(image), 0.0, 255.0)
+    # remove the batch dimension
+    shape = res_image.shape
+    return np.reshape(res_image, shape[1:])
 
   def _plot_images(self, p, x, a):
     p = self._postprocess_image(p)
