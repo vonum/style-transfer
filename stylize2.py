@@ -121,8 +121,8 @@ OUTPUT_IMAGE_PATH = args["output_image_path"]
 MAX_SIZE = args["max_size"]
 
 content_image = load_image(CONTENT_IMAGE_PATH, max_size=MAX_SIZE)
-content_image = add_one_dim(content_image)
 content_shape = [content_image.shape[1], content_image.shape[0]]
+content_image = add_one_dim(content_image)
 style_image = load_image(STYLE_IMAGE_PATH, shape=content_shape)
 style_image = add_one_dim(style_image)
 
