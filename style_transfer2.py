@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 
-from loss import gram_matrix
+from loss import gram_matrix, sum_squared_error, tv_loss
 import optimizers
 from optimizers import l_bfgs, adam, adagrad, gradient_descent
 from images import plot_images
@@ -101,10 +101,10 @@ class StyleTransfer:
 
       # batch_size, height, width, number of filters
       _, h, w, d = X.get_shape()
-      # N = h.value * w.value
-      # M = d.value
-      # factor = (1. / (2. * np.sqrt(M) * np.sqrt(N)))
-      self.content_loss += cw[i] * tf.reduce_sum(tf.square(X - P)) / 2
+      N = h.value * w.value
+      M = d.value
+      factor = (1. / (2. * np.sqrt(M) * np.sqrt(N)))
+      self.content_loss += cw[i] * sum_squared_error(X, P) * factor
 
   def _create_style_loss(self):
     self.style_loss = 0
@@ -122,10 +122,11 @@ class StyleTransfer:
       X_gram = gram_matrix(X)
       A_gram = gram_matrix(A)
 
-      self.style_loss += sw[i] * (1. / (4 * N ** 2 * M ** 2)) * tf.reduce_sum(tf.square(X_gram - A_gram))
+      sse = sum_squared_error(X_gram, A_gram)
+      self.style_loss += sw[i] * (1. / (4 * N ** 2 * M ** 2)) * sse
 
   def _create_tv_loss(self):
-    self.tv_loss = tf.image.total_variation(self.x[0])
+    self.tv_loss = tv_loss(self.x[0])
 
   def _create_optimizer(self):
     if self.optimizer_type == optimizers.L_BFGS:
@@ -209,6 +210,6 @@ class StyleTransfer:
     return self.net.feed_forward(tensor, scope)
 
   def _print_training_state(self, i, x, l, cl, sl, tvl):
-    print(f"Iteration: {i}|loss {l}|{cl}|{sl}|{tvl}")
     if (i % 10 == 0) or (i == self.iterations - 1):
+      print(f"Iteration: {i}|loss {l}|{cl}|{sl}|{tvl}")
       if self.plot: self._plot_images(self.p0, x, self.a0)

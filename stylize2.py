@@ -105,12 +105,17 @@ ap.add_argument(
   default=512,
   help="Max size for content image"
 )
+ap.add_argument(
+  "--init_type",
+  type=str,
+  default="content",
+  help="How to initialize image (content | style | random)"
+)
 
 args = vars(ap.parse_args())
 
 CONTENT_PATH = "data/content/"
 STYLE_PATH = "data/styles/"
-# comment out when running on floydhub
 
 CONTENT_IMAGE_PATH = CONTENT_PATH + args["content_image"]
 STYLE_IMAGE_PATH = STYLE_PATH + args["style_image"]
@@ -140,6 +145,7 @@ ITERATIONS = args["iterations"]
 OPTIMIZER = args["optimizer"]
 
 PRESERVE_COLOR = args["preserve_color"]
+INIT_TYPE = args["init_type"]
 
 net = vgg19.VGG19(MODEL_PATH)
 sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
@@ -158,7 +164,7 @@ st = StyleTransfer(
   STYLE_LOSS_WEIGHT,
   TV_LOSS_WEIGHT,
   OPTIMIZER,
-  init_img_type="content"
+  init_img_type=INIT_TYPE
 )
 
 mixed_image = st.run()
