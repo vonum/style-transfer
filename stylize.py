@@ -118,6 +118,17 @@ ap.add_argument(
   choices=[1, 2],
   help="Different types of normalization for content loss"
 )
+ap.add_argument(
+  "--save_it",
+  action="store_true",
+  help="Save images through the style transfer process"
+)
+ap.add_argument(
+  "--save_it_dir",
+  type=str,
+  default=None,
+  help="Directory in which to save images throgh the style transfer process"
+)
 
 args = vars(ap.parse_args())
 
@@ -155,6 +166,9 @@ PRESERVE_COLOR = args["preserve_color"]
 INIT_TYPE = args["init_type"]
 CONTENT_FACTOR_TYPE = args["content_factor_type"]
 
+SAVE_IT = args["save_it"]
+SAVE_IT_DIR = args["save_it_dir"]
+
 net = vgg19.VGG19(MODEL_PATH)
 sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
 
@@ -173,7 +187,9 @@ st = StyleTransfer(
   TV_LOSS_WEIGHT,
   OPTIMIZER,
   init_img_type=INIT_TYPE,
-  content_factor_type=CONTENT_FACTOR_TYPE
+  content_factor_type=CONTENT_FACTOR_TYPE,
+  save_it=SAVE_IT,
+  save_it_dir=SAVE_IT_DIR
 )
 
 mixed_image = st.run()

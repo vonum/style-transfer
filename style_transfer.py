@@ -5,6 +5,7 @@ from loss import gram_matrix, sum_squared_error, tv_loss
 import optimizers
 from optimizers import l_bfgs, adam, adagrad, gradient_descent
 from images import plot_images
+from images import save_image
 
 INIT_IMG_RANDOM = "random"
 INIT_IMG_CONTENT = "content"
@@ -16,7 +17,8 @@ class StyleTransfer:
                content_image, style_image, content_layer_weights,
                style_layer_weights, content_loss_weight, style_loss_weight,
                tv_loss_weight, optimizer_type, learning_rate=None,
-               plot=False, init_img_type=INIT_IMG_RANDOM, content_factor_type=1):
+               plot=False, init_img_type=INIT_IMG_RANDOM, content_factor_type=1,
+               save_it=False, save_it_dir=None):
     self.sess = sess
     self.net = net
     self.iterations = iterations
@@ -34,7 +36,10 @@ class StyleTransfer:
 
     self.content_factor_type = content_factor_type
     self.init_img_type = init_img_type
+
     self.plot = plot
+    self.save_it = save_it
+    self.save_it_dir = save_it_dir
 
     # variable names from the paper
     self.p0 = np.float32(self._preprocess_image(content_image))
@@ -216,5 +221,14 @@ class StyleTransfer:
 
   def _print_training_state(self, i, x, l, cl, sl, tvl):
     print(f"Iteration: {i}|loss {l}|{cl}|{sl}|{tvl}")
-    if (i % 10 == 0) or (i == self.iterations - 1):
+    if (i % 10 == 0):
       if self.plot: self._plot_images(self.p0, x, self.a0)
+      # remove batch dimension
+      if self.save_it: self._save_image(x[0], i)
+
+  def _save_image(self, x, i):
+    path = self._image_path(i)
+    save_image(x, path)
+
+  def _image_path(self, i):
+    return f"{self.save_it_dir}/it{i}.jpg"
