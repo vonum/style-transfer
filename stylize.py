@@ -2,7 +2,7 @@ import argparse
 import tensorflow as tf
 
 import vgg19
-from style_transfer2 import StyleTransfer
+from style_transfer import StyleTransfer
 
 from images import load_image, save_image, add_one_dim
 

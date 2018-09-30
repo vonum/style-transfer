@@ -210,6 +210,6 @@ class StyleTransfer:
     return self.net.feed_forward(tensor, scope)
 
   def _print_training_state(self, i, x, l, cl, sl, tvl):
+    print(f"Iteration: {i}|loss {l}|{cl}|{sl}|{tvl}")
     if (i % 10 == 0) or (i == self.iterations - 1):
-      print(f"Iteration: {i}|loss {l}|{cl}|{sl}|{tvl}")
       if self.plot: self._plot_images(self.p0, x, self.a0)
