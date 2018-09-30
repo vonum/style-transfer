@@ -111,6 +111,13 @@ ap.add_argument(
   default="content",
   help="How to initialize image (content | style | random)"
 )
+ap.add_argument(
+  "--content_factor_type",
+  type=int,
+  default=1,
+  choices=[1, 2],
+  help="Different types of normalization for content loss"
+)
 
 args = vars(ap.parse_args())
 
@@ -146,6 +153,7 @@ OPTIMIZER = args["optimizer"]
 
 PRESERVE_COLOR = args["preserve_color"]
 INIT_TYPE = args["init_type"]
+CONTENT_FACTOR_TYPE = args["content_factor_type"]
 
 net = vgg19.VGG19(MODEL_PATH)
 sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
@@ -164,7 +172,8 @@ st = StyleTransfer(
   STYLE_LOSS_WEIGHT,
   TV_LOSS_WEIGHT,
   OPTIMIZER,
-  init_img_type=INIT_TYPE
+  init_img_type=INIT_TYPE,
+  content_factor_type=CONTENT_FACTOR_TYPE
 )
 
 mixed_image = st.run()

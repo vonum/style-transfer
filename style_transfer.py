@@ -16,15 +16,12 @@ class StyleTransfer:
                content_image, style_image, content_layer_weights,
                style_layer_weights, content_loss_weight, style_loss_weight,
                tv_loss_weight, optimizer_type, learning_rate=None,
-               plot=False, init_img_type=INIT_IMG_RANDOM):
+               plot=False, init_img_type=INIT_IMG_RANDOM, content_factor_type=1):
     self.sess = sess
     self.net = net
     self.iterations = iterations
     self.optimizer_type = optimizer_type
     self.learning_rate = learning_rate
-
-    self.init_img_type = init_img_type
-    self.plot = plot
 
     self.content_layers = content_layers
     self.style_layers = style_layers
@@ -34,6 +31,10 @@ class StyleTransfer:
     self.alpha = content_loss_weight
     self.beta = style_loss_weight
     self.theta = tv_loss_weight
+
+    self.content_factor_type = content_factor_type
+    self.init_img_type = init_img_type
+    self.plot = plot
 
     # variable names from the paper
     self.p0 = np.float32(self._preprocess_image(content_image))
@@ -99,11 +100,7 @@ class StyleTransfer:
       X = self.Xs_content[i]
       P = self.Ps[i]
 
-      # batch_size, height, width, number of filters
-      _, h, w, d = X.get_shape()
-      N = h.value * w.value
-      M = d.value
-      factor = (1. / (2. * np.sqrt(M) * np.sqrt(N)))
+      factor = self._content_loss_factor(X)
       self.content_loss += cw[i] * sum_squared_error(X, P) * factor
 
   def _create_style_loss(self):
@@ -188,8 +185,16 @@ class StyleTransfer:
     else:
       raise "Unsupported initialization strategy"
 
-  def _content_norm_factor(self, strategy):
-    pass
+  def _content_loss_factor(self, X):
+    if self.content_factor_type == 1:
+      # batch_size, height, width, number of filters
+      _, h, w, d = X.get_shape()
+      N = h.value * w.value
+      M = d.value
+
+      return (1. / (2. * np.sqrt(M) * np.sqrt(N)))
+    else:
+      return 0.5
 
   def _preprocess_image(self, image):
     return self.net.preprocess(image)
