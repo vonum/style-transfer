@@ -4,21 +4,21 @@ import numpy as np
 from loss import gram_matrix, sum_squared_error, tv_loss
 import optimizers
 from optimizers import l_bfgs, adam, adagrad, gradient_descent
-from images import plot_images
-from images import save_image
+
+from training_monitor import TrainingMonitor
 
 INIT_IMG_RANDOM = "random"
 INIT_IMG_CONTENT = "content"
 INIT_IMG_STYLE = "style"
 
-# add content loss norm type and init strategy
 class StyleTransfer:
-  def __init__(self, sess, net, iterations, content_layers, style_layers,
-               content_image, style_image, content_layer_weights,
-               style_layer_weights, content_loss_weight, style_loss_weight,
-               tv_loss_weight, optimizer_type, learning_rate=None,
-               plot=False, init_img_type=INIT_IMG_RANDOM, content_factor_type=1,
-               save_it=False, save_it_dir=None):
+  def __init__(self, sess, net, iterations,
+               content_layers, style_layers, content_img, style_img,
+               content_layer_weights, style_layer_weights,
+               content_loss_weight, style_loss_weight, tv_loss_weight,
+               optimizer_type, learning_rate=None,
+               init_img_type=INIT_IMG_RANDOM, content_factor_type=1,
+               plot=False, save_it=False, save_it_dir=None):
     self.sess = sess
     self.net = net
     self.iterations = iterations
@@ -34,17 +34,21 @@ class StyleTransfer:
     self.beta = style_loss_weight
     self.theta = tv_loss_weight
 
-    self.content_factor_type = content_factor_type
     self.init_img_type = init_img_type
+    self.content_factor_type = content_factor_type
 
-    self.plot = plot
-    self.save_it = save_it
-    self.save_it_dir = save_it_dir
+    self.training_monitor = TrainingMonitor(
+                              plot,
+                              save_it,
+                              save_it_dir,
+                              content_img[0],
+                              style_img[0]
+                            )
 
     # variable names from the paper
-    self.p0 = np.float32(self._preprocess_image(content_image))
-    self.a0 = np.float32(self._preprocess_image(style_image))
-    self.x0 = self.init_img()
+    self.p0 = np.float32(self._preprocess_img(content_img))
+    self.a0 = np.float32(self._preprocess_img(style_img))
+    self.x0 = self._init_img()
 
     self._build_graph()
 
@@ -54,7 +58,7 @@ class StyleTransfer:
     self._optimize()
 
     res_img = self.sess.run(self.x)
-    res_img = self._postprocess_image(res_img)
+    res_img = self._postprocess_img(res_img)
 
     return res_img
 
@@ -67,7 +71,7 @@ class StyleTransfer:
 
     self._create_content_activations()
     self._create_style_activations()
-    self._create_mixed_image_activations()
+    self._create_mixed_img_activations()
 
     self._create_loss()
 
@@ -83,7 +87,7 @@ class StyleTransfer:
     # activations for style image for specified layers
     self.As = [style_activations[id] for id in self.style_layers]
 
-  def _create_mixed_image_activations(self):
+  def _create_mixed_img_activations(self):
     Xs = self._feed_forward(self.x, scope="mixed")
     self.Xs_content = [Xs[id] for id in self.content_layers]
     self.Xs_style = [Xs[id] for id in self.style_layers]
@@ -157,7 +161,8 @@ class StyleTransfer:
 
     def callback(x, l, cl, sl, tvl):
       global _iter
-      self._print_training_state(_iter, x, l, cl, sl, tvl)
+      x = self._postprocess_img(x)
+      self.training_monitor.monitor_iteration(_iter, x, l, cl, sl, tvl)
       _iter += 1
 
     feed_dict = {self.p: self.p0, self.a: self.a0}
@@ -178,9 +183,10 @@ class StyleTransfer:
     for i in range(0, self.iterations):
       _, x, l, cl, sl, tvl = self.sess.run(run_list,
                                            feed_dict=feed_dict)
-      self._print_training_state(i, x, l, cl, sl, tvl)
+      x = self._postprocess_img(x)
+      self.training_monitor.monitor_iteration(i, x, l, cl, sl, tvl)
 
-  def init_img(self):
+  def _init_img(self):
     if self.init_img_type == INIT_IMG_RANDOM:
       return np.random.normal(size=self.p0.shape, scale=np.std(self.p0))
     elif self.init_img_type == INIT_IMG_CONTENT:
@@ -201,34 +207,14 @@ class StyleTransfer:
     else:
       return 0.5
 
-  def _preprocess_image(self, image):
-    return self.net.preprocess(image)
+  def _preprocess_img(self, img):
+    return self.net.preprocess(img)
 
-  def _postprocess_image(self, image):
-    res_image = np.clip(self.net.undo_preprocess(image), 0.0, 255.0)
+  def _postprocess_img(self, img):
+    res_img = np.clip(self.net.undo_preprocess(img), 0.0, 255.0)
     # remove the batch dimension
-    shape = res_image.shape
-    return np.reshape(res_image, shape[1:])
-
-  def _plot_images(self, p, x, a):
-    p = self._postprocess_image(p)
-    a = self._postprocess_image(a)
-    x = self._postprocess_image(x)
-    plot_images(content_image=p, style_image=a, mixed_image=x)
+    shape = res_img.shape
+    return np.reshape(res_img, shape[1:])
 
   def _feed_forward(self, tensor, scope=None):
     return self.net.feed_forward(tensor, scope)
-
-  def _print_training_state(self, i, x, l, cl, sl, tvl):
-    print(f"Iteration: {i}|loss {l}|{cl}|{sl}|{tvl}")
-    if (i % 10 == 0):
-      if self.plot: self._plot_images(self.p0, x, self.a0)
-      # remove batch dimension
-      if self.save_it: self._save_image(x[0], i)
-
-  def _save_image(self, x, i):
-    path = self._image_path(i)
-    save_image(x, path)
-
-  def _image_path(self, i):
-    return f"{self.save_it_dir}/it{i}.jpg"
