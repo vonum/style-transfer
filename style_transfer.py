@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+import pdb
 
 from loss import gram_matrix, sum_squared_error, tv_loss
 import optimizers
@@ -61,6 +62,9 @@ class StyleTransfer:
     res_img = self._postprocess_img(res_img)
 
     return res_img
+
+  def loss_summary(self):
+    return self.training_monitor.loss_summary()
 
   def _build_graph(self):
     # result image
