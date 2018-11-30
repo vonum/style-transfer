@@ -1,5 +1,6 @@
 import argparse
 import tensorflow as tf
+import pickle
 
 import vgg19
 from style_transfer import StyleTransfer
@@ -23,6 +24,12 @@ ap.add_argument(
   type=str,
   default="/output/output.jpg", # for floydhub
   help="Path for output file"
+)
+ap.add_argument(
+  "--loss_summary_path",
+  type=str,
+  default="/output/loss_summary.pickle", # for floydhub
+  help="Path for loss summary"
 )
 ap.add_argument(
   "--model_path",
@@ -140,6 +147,7 @@ STYLE_IMAGE_PATH = STYLE_PATH + args["style_image"]
 
 MODEL_PATH = args["model_path"]
 OUTPUT_IMAGE_PATH = args["output_image_path"]
+LOSS_SUMMARY_PATH = args["loss_summary_path"]
 
 MAX_SIZE = args["max_size"]
 
@@ -193,7 +201,11 @@ st = StyleTransfer(
 )
 
 mixed_image = st.run()
+summary = st.loss_summary()
 
 sess.close()
 
 save_image(mixed_image, OUTPUT_IMAGE_PATH)
+
+with open(LOSS_SUMMARY_PATH, "wb") as handle:
+  pickle.dump(summary, handle, protocol=pickle.HIGHEST_PROTOCOL)
