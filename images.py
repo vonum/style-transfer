@@ -9,7 +9,7 @@ def load_image(filename, max_size=None, shape=None):
   if max_size is not None:
      factor = max_size / np.max(image.size)
 
-     # Scale the image's height and width.
+     # Scale the image"s height and width.
      size = np.array(image.size) * factor
      size = size.astype(int)
 
@@ -30,8 +30,8 @@ def save_image(image, filename):
   image = np.clip(image, 0.0, 255.0)
   image = image.astype(np.uint8)
 
-  with open(filename, 'wb') as file:
-    PIL.Image.fromarray(image).save(file, 'jpeg')
+  with open(filename, "wb") as file:
+    PIL.Image.fromarray(image).save(file, "jpeg")
 
 def image_big(image):
   image = np.clip(image, 0.0, 255.0)
@@ -50,9 +50,9 @@ def plot_images(content_image, style_image, mixed_image):
   smooth = True
 
   if smooth:
-    interpolation = 'sinc'
+    interpolation = "sinc"
   else:
-    interpolation = 'nearest'
+    interpolation = "nearest"
 
   # Plot the content-image.
   # Note that the pixel-values are normalized to
