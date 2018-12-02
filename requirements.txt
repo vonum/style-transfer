@@ -5,3 +5,4 @@ download
 Pillow
 matplotlib
 scipy
+opencv-python
