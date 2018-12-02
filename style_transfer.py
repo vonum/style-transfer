@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 import pdb
 
-from loss import gram_matrix, sum_squared_error, tv_loss
+from losses import gram_matrix, sum_squared_error, tv_loss
 import optimizers
 from optimizers import l_bfgs, adam, adagrad, gradient_descent
 
@@ -215,7 +215,8 @@ class StyleTransfer:
     return self.net.preprocess(img)
 
   def _postprocess_img(self, img):
-    res_img = np.clip(self.net.undo_preprocess(img), 0.0, 255.0)
+    postprocessed_img = self.net.undo_preprocess(img)
+    res_img = np.clip(postprocessed_img, 0.0, 255.0)
     # remove the batch dimension
     shape = res_img.shape
     return np.reshape(res_img, shape[1:])
