@@ -11,34 +11,40 @@ ap = argparse.ArgumentParser()
 
 ap.add_argument(
   "--content_image",
+  "-c",
   type=str,
   help="Name of the content image"
 )
 ap.add_argument(
   "--style_image",
+  "-s",
   type=str,
   help="Name of the style image"
 )
 ap.add_argument(
   "--output_image_path",
+  "-o",
   type=str,
   default="/output/output.jpg", # for floydhub
   help="Path for output file"
 )
 ap.add_argument(
   "--loss_summary_path",
+  "-sum",
   type=str,
   default="/output/loss_summary.pickle", # for floydhub
   help="Path for loss summary"
 )
 ap.add_argument(
   "--model_path",
+  "-m",
   type=str,
   default="vgg19/vgg19.mat",
   help="Path for vgg19 network"
 )
 ap.add_argument(
   "--content_layers",
+  "-cl",
   nargs="+",
   type=str,
   default=["conv4_2"],
@@ -46,6 +52,7 @@ ap.add_argument(
 )
 ap.add_argument(
   "--style_layers",
+  "-sl",
   nargs="+",
   type=str,
   default=["relu1_1", "relu2_1", "relu3_1", "relu4_1", "relu5_1"],
@@ -53,6 +60,7 @@ ap.add_argument(
 )
 ap.add_argument(
   "--content_layer_weights",
+  "-clw",
   nargs="+",
   type=str,
   default=[1.0],
@@ -60,6 +68,7 @@ ap.add_argument(
 )
 ap.add_argument(
   "--style_layer_weights",
+  "-slw",
   nargs="+",
   type=str,
   default=[0.2, 0.2, 0.2, 0.2, 0.2],
@@ -67,36 +76,42 @@ ap.add_argument(
 )
 ap.add_argument(
   "--content_loss_weight",
+  "-cw",
   type=float,
   default=5e0,
   help="Weight for the content loss function"
 )
 ap.add_argument(
   "--style_loss_weight",
+  "-sw",
   type=float,
   default=1e4,
   help="Weight for the style loss function"
 )
 ap.add_argument(
   "--tv_loss_weight",
+  "-tvw",
   type=float,
   default=1e-3,
   help="Weight for the total variation loss function"
 )
 ap.add_argument(
   "--learning_rate",
+  "-lr",
   type=float,
   default=5,
   help="Learning rate for optimizers"
 )
 ap.add_argument(
   "--iterations",
+  "-it",
   type=float,
   default=500,
   help="Number of iterations to run style transfer"
 )
 ap.add_argument(
   "--optimizer",
+  "-op",
   type=str,
   default="l_bfgs",
   help="Optimizer for style transfer"
@@ -115,17 +130,20 @@ ap.add_argument(
 )
 ap.add_argument(
   "--preserve_colors",
+  "-pc",
   action="store_true",
   help="Transfer style but keep original content colors"
 )
 ap.add_argument(
   "--cvt_type",
+  "-ct",
   type=str,
   default="ycrcb",
   help="How to transfer colors to result image (ycrcb | yuv | lab | luv)"
 )
 ap.add_argument(
   "--content_factor_type",
+  "-cft",
   type=int,
   default=1,
   choices=[1, 2],
@@ -133,11 +151,13 @@ ap.add_argument(
 )
 ap.add_argument(
   "--save_it",
+  "-si",
   action="store_true",
   help="Save images through the style transfer process"
 )
 ap.add_argument(
   "--save_it_dir",
+  "-sid",
   type=str,
   default=None,
   help="Directory in which to save images throgh the style transfer process"
