@@ -6,6 +6,8 @@ from losses import gram_matrix, sum_squared_error, tv_loss
 import optimizers
 from optimizers import l_bfgs, adam, adagrad, gradient_descent
 
+from color_transfer import ColorTransfer
+
 from training_monitor import TrainingMonitor
 
 INIT_IMG_RANDOM = "random"
@@ -19,6 +21,7 @@ class StyleTransfer:
                content_loss_weight, style_loss_weight, tv_loss_weight,
                optimizer_type, learning_rate=None,
                init_img_type=INIT_IMG_RANDOM, content_factor_type=1,
+               preserve_colors=False, cvt_type="ycrcb",
                plot=False, save_it=False, save_it_dir=None):
     self.sess = sess
     self.net = net
@@ -37,6 +40,9 @@ class StyleTransfer:
 
     self.init_img_type = init_img_type
     self.content_factor_type = content_factor_type
+
+    self.preserve_colors = preserve_colors
+    self.cvt_type = cvt_type
 
     self.training_monitor = TrainingMonitor(
                               plot,
@@ -60,6 +66,13 @@ class StyleTransfer:
 
     res_img = self.sess.run(self.x)
     res_img = self._postprocess_img(res_img)
+
+    if self.preserve_colors:
+      # opencv does not support float64
+      content_img = self._postprocess_img(self.x0).astype(np.float32)
+      res_img = res_img.astype(np.float32)
+
+      res_img = self._transfer_colors(res_img, content_img, self.cvt_type)
 
     return res_img
 
@@ -199,6 +212,10 @@ class StyleTransfer:
       return self.a0
     else:
       raise "Unsupported initialization strategy"
+
+  def _transfer_colors(self, content_img, color_img, cvt_type):
+    ct = ColorTransfer(content_img, color_img)
+    return ct.luminance_transfer(cvt_type)
 
   def _content_loss_factor(self, X):
     if self.content_factor_type == 1:
