@@ -102,11 +102,6 @@ ap.add_argument(
   help="Optimizer for style transfer"
 )
 ap.add_argument(
-  "--preserve_color",
-  action="store_true",
-  help="Transfer style but keep original content colors"
-)
-ap.add_argument(
   "--max_size",
   type=int,
   default=512,
@@ -117,6 +112,17 @@ ap.add_argument(
   type=str,
   default="content",
   help="How to initialize image (content | style | random)"
+)
+ap.add_argument(
+  "--preserve_colors",
+  action="store_true",
+  help="Transfer style but keep original content colors"
+)
+ap.add_argument(
+  "--cvt_type",
+  type=str,
+  default="ycrcb",
+  help="How to transfer colors to result image (ycrcb | yuv | lab | luv)"
 )
 ap.add_argument(
   "--content_factor_type",
@@ -170,8 +176,9 @@ LEARNING_RATE = args["learning_rate"]
 ITERATIONS = args["iterations"]
 OPTIMIZER = args["optimizer"]
 
-PRESERVE_COLOR = args["preserve_color"]
 INIT_TYPE = args["init_type"]
+PRESERVE_COLORS = args["preserve_colors"]
+CVT_TYPE = args["cvt_type"]
 CONTENT_FACTOR_TYPE = args["content_factor_type"]
 
 SAVE_IT = args["save_it"]
@@ -195,6 +202,8 @@ st = StyleTransfer(
   TV_LOSS_WEIGHT,
   OPTIMIZER,
   init_img_type=INIT_TYPE,
+  preserve_colors=PRESERVE_COLORS,
+  cvt_type=CVT_TYPE,
   content_factor_type=CONTENT_FACTOR_TYPE,
   save_it=SAVE_IT,
   save_it_dir=SAVE_IT_DIR
