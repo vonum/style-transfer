@@ -4,7 +4,7 @@ import pdb
 
 from losses import gram_matrix, sum_squared_error, tv_loss
 import optimizers
-from optimizers import l_bfgs, adam, adagrad, gradient_descent
+from optimizers import l_bfgs, adam, adagrad, gradient_descent, rmsprop
 
 from color_transfer import ColorTransfer
 
@@ -162,6 +162,9 @@ class StyleTransfer:
       self.train_op = self.optimizer.minimize(self.loss)
     elif self.optimizer_type == optimizers.GRADIENT_DESCENT:
       self.optimizer = gradient_descent(self.learning_rate)
+      self.train_op = self.optimizer.minimize(self.loss)
+    elif self.optimizer_type == optimizers.RMSPROP:
+      self.optimizer = rmsprop(self.learning_rate)
       self.train_op = self.optimizer.minimize(self.loss)
     else:
       raise "Unsupported optimizer"

@@ -105,7 +105,7 @@ ap.add_argument(
 ap.add_argument(
   "--iterations",
   "-it",
-  type=float,
+  type=int,
   default=500,
   help="Number of iterations to run style transfer"
 )
@@ -221,6 +221,7 @@ st = StyleTransfer(
   STYLE_LOSS_WEIGHT,
   TV_LOSS_WEIGHT,
   OPTIMIZER,
+  learning_rate=LEARNING_RATE,
   init_img_type=INIT_TYPE,
   preserve_colors=PRESERVE_COLORS,
   cvt_type=CVT_TYPE,
