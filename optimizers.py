@@ -5,6 +5,7 @@ ADAM = "adam"
 ADAGRAD = "adagrad"
 GRADIENT_DESCENT = "gradient_descent"
 RMSPROP = "rmsprop"
+ADADELTA = "adadelta"
 
 def adam(learning_rate):
   return tf.train.AdamOptimizer(learning_rate=learning_rate)
@@ -24,3 +25,6 @@ def adagrad(learning_rate):
 
 def rmsprop(learning_rate):
   return tf.train.RMSPropOptimizer(learning_rate=learning_rate)
+
+def adadelta(learning_rate):
+  return tf.train.AdadeltaOptimizer(learning_rate=learning_rate)
